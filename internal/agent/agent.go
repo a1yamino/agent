@@ -8,13 +8,13 @@ import (
 	"sync"
 	"time"
 
-	"phoenix-node-agent/internal/api"
-	"phoenix-node-agent/internal/config"
-	"phoenix-node-agent/internal/container"
-	"phoenix-node-agent/internal/frp"
-	"phoenix-node-agent/internal/gpu"
-	"phoenix-node-agent/internal/registration"
-	"phoenix-node-agent/internal/system"
+	"utopia-node-agent/internal/api"
+	"utopia-node-agent/internal/config"
+	"utopia-node-agent/internal/container"
+	"utopia-node-agent/internal/frp"
+	"utopia-node-agent/internal/gpu"
+	"utopia-node-agent/internal/registration"
+	"utopia-node-agent/internal/system"
 )
 
 // Agent 节点代理
@@ -84,7 +84,7 @@ func (a *Agent) Start() error {
 
 // Stop 停止代理
 func (a *Agent) Stop() error {
-	fmt.Println("Stopping Phoenix Node Agent...")
+	fmt.Println("Stopping Utopia Node Agent...")
 
 	// 取消上下文
 	a.cancel()
@@ -125,7 +125,7 @@ func (a *Agent) Stop() error {
 		}
 	}
 
-	fmt.Println("Phoenix Node Agent stopped")
+	fmt.Println("Utopia Node Agent stopped")
 	return nil
 }
 

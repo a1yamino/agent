@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"phoenix-node-agent/internal/gpu"
-	"phoenix-node-agent/internal/system"
+	"utopia-node-agent/internal/gpu"
+	"utopia-node-agent/internal/system"
 )
 
 func main() {
-	fmt.Println("Phoenix Node Agent - GPU Monitor Test")
+	fmt.Println("Utopia Node Agent - GPU Monitor Test")
 	fmt.Println("=====================================")
 
 	// 测试GPU监控
@@ -46,7 +46,7 @@ func main() {
 		log.Printf("Failed to get system metrics: %v", err)
 	} else {
 		fmt.Printf("CPU Usage: %.1f%%\n", metrics.CPUUsagePercent)
-		fmt.Printf("Memory Usage: %.1f%% (%dMB/%dMB)\n", 
+		fmt.Printf("Memory Usage: %.1f%% (%dMB/%dMB)\n",
 			metrics.MemoryUsagePercent, metrics.MemoryUsedMB, metrics.MemoryTotalMB)
 		fmt.Printf("Load Average: %.2f\n", metrics.LoadAverage)
 		fmt.Printf("Uptime: %d seconds\n", metrics.Uptime)
