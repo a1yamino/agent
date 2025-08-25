@@ -1,0 +1,21 @@
+# Utopia Node Agent Configuration
+# 节点ID持久化路径
+identity_file_path: "/etc/utopia/node_id"
+
+# 中央平台信息
+central_platform:
+  api_url: "http://api.server.com"
+  # (可选) 用于首次注册的引导令牌
+  # bootstrap_token: "a_secure_one_time_token"
+
+# frp相关配置
+frp:
+  server_addr: "api.server.com"
+  server_port: 7000
+  token: "frp_connection_token"
+
+# Agent自身API服务配置
+agent_api:
+  listen_address: "127.0.0.1:9200"
+  # 用于与中央平台通信的认证令牌
+  auth_token: "a_very_secret_agent_api_token"

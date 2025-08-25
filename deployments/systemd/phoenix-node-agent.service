@@ -1,0 +1,24 @@
+[Unit]
+Description=Utopia Platform GPU Node Agent
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=utopia-agent
+Group=docker
+ExecStart=/usr/local/bin/utopia-node-agent --config /etc/utopia/agent-config.yaml
+Restart=on-failure
+RestartSec=15s
+StandardOutput=journal
+StandardError=journal
+
+# 环境变量
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+# 资源限制
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
