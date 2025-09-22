@@ -143,17 +143,17 @@ func (a *Agent) bootstrap() error {
 		return nil
 	}
 
-	// 2. 获取机器ID
-	machineID, err := registration.GetMachineID()
-	if err != nil {
-		return fmt.Errorf("failed to get machine ID: %w", err)
-	}
+	// // 2. 获取机器ID
+	// machineID, err := registration.GetMachineID()
+	// if err != nil {
+	// 	return fmt.Errorf("failed to get machine ID: %w", err)
+	// }
 
-	fmt.Printf("Machine ID: %s\n", machineID)
+	// fmt.Printf("Machine ID: %s\n", machineID)
 
 	// 3. 向平台注册
 	regClient := registration.NewClient(a.config.CentralPlatform.APIURL)
-	regResp, err := regClient.Register(machineID, a.config.CentralPlatform.BootstrapToken)
+	regResp, err := regClient.Register(a.config.CentralPlatform.BootstrapToken)
 	if err != nil {
 		return fmt.Errorf("failed to register with platform: %w", err)
 	}
@@ -198,7 +198,7 @@ func (a *Agent) initializeMonitors() error {
 
 // initializeContainerManager 初始化容器管理器
 func (a *Agent) initializeContainerManager() error {
-	containerManager, err := container.NewManager()
+	containerManager, err := container.NewManager(a.gpuMonitor)
 	if err != nil {
 		return fmt.Errorf("failed to create container manager: %w", err)
 	}

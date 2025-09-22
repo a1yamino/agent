@@ -160,6 +160,15 @@ func (m *Monitor) IsGPUAvailable(id int) bool {
 	return !gpu.Busy
 }
 
+// IsGPUInUse 检查GPU是否正在使用
+func (m *Monitor) IsGPUInUse(id int) bool {
+	gpu, exists := m.GetGPUByID(id)
+	if !exists {
+		return false
+	}
+	return gpu.Busy
+}
+
 // GetAvailableGPUs 获取所有可用的GPU ID列表
 func (m *Monitor) GetAvailableGPUs() []int {
 	m.mu.RLock()

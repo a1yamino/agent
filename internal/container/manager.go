@@ -15,7 +15,7 @@ import (
 type CreateRequest struct {
 	ClaimID      string            `json:"claim_id" binding:"required"`
 	Image        string            `json:"image" binding:"required"`
-	GPUIDs       []int             `json:"gpu_ids" binding:"required"`
+	GPUCount     int               `json:"gpu_count" binding:"required"` // 只需要指定GPU数量
 	PortMappings []PortMapping     `json:"port_mappings"`
 	EnvVars      []string          `json:"env_vars"`
 	Command      []string          `json:"command,omitempty"`
@@ -69,10 +69,17 @@ type DockerContainer struct {
 type Manager struct {
 	mu         sync.RWMutex
 	containers map[string]ContainerInfo // containerID -> ContainerInfo
+	gpuMonitor GPUMonitor               // GPU监控器接口
+}
+
+// GPUMonitor GPU监控器接口
+type GPUMonitor interface {
+	GetAvailableGPUs() []int
+	IsGPUInUse(gpuID int) bool
 }
 
 // NewManager 创建新的容器管理器
-func NewManager() (*Manager, error) {
+func NewManager(gpuMonitor GPUMonitor) (*Manager, error) {
 	// 检查Docker是否可用
 	if err := exec.Command("docker", "version").Run(); err != nil {
 		return nil, fmt.Errorf("docker is not available: %w", err)
@@ -80,6 +87,7 @@ func NewManager() (*Manager, error) {
 
 	return &Manager{
 		containers: make(map[string]ContainerInfo),
+		gpuMonitor: gpuMonitor,
 	}, nil
 }
 
@@ -90,16 +98,26 @@ func (m *Manager) Close() error {
 
 // CreateContainer 创建并启动容器
 func (m *Manager) CreateContainer(ctx context.Context, req *CreateRequest) (string, error) {
-	// 构建Docker运行命令
+	// 1. 自动分配可用的GPU
+	availableGPUs := m.gpuMonitor.GetAvailableGPUs()
+	if len(availableGPUs) < req.GPUCount {
+		return "", fmt.Errorf("insufficient available GPUs: need %d, only %d available",
+			req.GPUCount, len(availableGPUs))
+	}
+
+	// 选择前N个可用GPU
+	allocatedGPUs := availableGPUs[:req.GPUCount]
+
+	// 2. 构建Docker运行命令
 	args := []string{"run", "-d"}
 
-	// 添加GPU设备
-	if len(req.GPUIDs) > 0 {
-		gpuList := make([]string, len(req.GPUIDs))
-		for i, id := range req.GPUIDs {
+	// 添加GPU设备（如果需要GPU）
+	if req.GPUCount > 0 {
+		gpuList := make([]string, len(allocatedGPUs))
+		for i, id := range allocatedGPUs {
 			gpuList[i] = strconv.Itoa(id)
 		}
-		args = append(args, "--gpus", fmt.Sprintf("device=%s", strings.Join(gpuList, ",")))
+		args = append(args, "--gpus", fmt.Sprintf("\"device=%s\"", strings.Join(gpuList, ",")))
 	}
 
 	// 添加端口映射
@@ -122,10 +140,11 @@ func (m *Manager) CreateContainer(ctx context.Context, req *CreateRequest) (stri
 		args = append(args, "-v", fmt.Sprintf("%s:%s", hostPath, containerPath))
 	}
 
-	// 添加标签
+	// 添加标签（记录实际分配的GPU）
 	args = append(args,
 		"--label", fmt.Sprintf("utopia.claim_id=%s", req.ClaimID),
-		"--label", fmt.Sprintf("utopia.gpu_ids=%s", strings.Join(convertIntSliceToStringSlice(req.GPUIDs), ",")),
+		"--label", fmt.Sprintf("utopia.gpu_ids=%s", strings.Join(convertIntSliceToStringSlice(allocatedGPUs), ",")),
+		"--label", fmt.Sprintf("utopia.gpu_count=%d", req.GPUCount),
 		"--label", "utopia.managed=true",
 		"--label", "utopia.node_type=gpu",
 	)

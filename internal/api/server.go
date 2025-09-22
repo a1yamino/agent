@@ -158,15 +158,23 @@ func (s *Server) createContainer(c *gin.Context) {
 		return
 	}
 
-	// 验证GPU是否可用
-	for _, gpuID := range req.GPUIDs {
-		if !s.gpuMonitor.IsGPUAvailable(gpuID) {
-			c.JSON(http.StatusConflict, ErrorResponse{
-				Error: fmt.Sprintf("GPU %d is not available", gpuID),
-				Code:  409,
-			})
-			return
-		}
+	// 验证GPU数量是否合理
+	if req.GPUCount < 0 {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "GPU count must be non-negative",
+			Code:  400,
+		})
+		return
+	}
+
+	// 检查是否有足够的可用GPU
+	availableGPUs := s.gpuMonitor.GetAvailableGPUs()
+	if req.GPUCount > len(availableGPUs) {
+		c.JSON(http.StatusConflict, ErrorResponse{
+			Error: fmt.Sprintf("Not enough available GPUs: requested %d, available %d", req.GPUCount, len(availableGPUs)),
+			Code:  409,
+		})
+		return
 	}
 
 	// 创建容器

@@ -110,9 +110,8 @@ func SaveNodeID(filePath, nodeID string) error {
 }
 
 // Register 向中央平台注册节点
-func (c *Client) Register(machineID, bootstrapToken string) (*RegisterResponse, error) {
+func (c *Client) Register(bootstrapToken string) (*RegisterResponse, error) {
 	req := RegisterRequest{
-		MachineID:      machineID,
 		BootstrapToken: bootstrapToken,
 	}
 
