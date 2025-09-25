@@ -4,15 +4,15 @@ identity_file_path: "/etc/utopia/node_id"
 
 # 中央平台信息
 central_platform:
-  api_url: "http://api.server.com"
+  api_url: "http://101.126.152.16:8081"
   # (可选) 用于首次注册的引导令牌
-  # bootstrap_token: "a_secure_one_time_token"
+  # bootstrap_token: "a-very-secret-key"
 
 # frp相关配置
 frp:
-  server_addr: "api.server.com"
+  server_addr: "101.126.152.16"
   server_port: 7000
-  token: "frp_connection_token"
+  token: "utopia-auth-token"
 
 # Agent自身API服务配置
 agent_api:

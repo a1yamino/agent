@@ -121,7 +121,7 @@ func (c *Client) Register(bootstrapToken string) (*RegisterResponse, error) {
 	}
 
 	resp, err := c.httpClient.Post(
-		c.apiURL+"/api/v1/nodes/register",
+		c.apiURL+"/api/nodes/register",
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
