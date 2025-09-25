@@ -43,35 +43,44 @@ const frpcTemplate = `
 serverAddr = "{{.ServerAddr}}"
 serverPort = {{.ServerPort}}
 token = "{{.FrpToken}}"
-meta_node_id = "{{.NodeID}}"
+user = "{{.NodeID}}"
 
 # 控制隧道
-[control_{{.NodeID}}]
+[[proxies]]
+name = "control_{{.NodeID}}"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.AgentApiPort}}
 remotePort = 0
-meta_tunnel_type = "agent-control"
+[proxies.metadatas]
+node_id = "{{.NodeID}}"
+tunnel_type = "agent-control"
 
 # 数据隧道 - 使用range循环为每张卡生成
 {{range .Gpus}}
-[data_{{$.NodeID}}_gpu{{.ID}}_web]
+[[proxies]]
+name = "data_{{$.NodeID}}_gpu{{.ID}}_web"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.WebLocalPort}}
 remotePort = 0
-meta_tunnel_type = "container-data"
-meta_gpu_id = {{.ID}}
-meta_port_name = "web"
+[proxies.metadatas]
+node_id = "{{$.NodeID}}"
+tunnel_type = "container-data"
+gpu_id = "{{.ID}}"
+port_name = "web"
 
-[data_{{$.NodeID}}_gpu{{.ID}}_ssh]
+[[proxies]]
+name = "data_{{$.NodeID}}_gpu{{.ID}}_ssh"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.SshLocalPort}}
 remotePort = 0
-meta_tunnel_type = "container-data"
-meta_gpu_id = {{.ID}}
-meta_port_name = "ssh"
+[proxies.metadatas]
+node_id = "{{$.NodeID}}"
+tunnel_type = "container-data"
+gpu_id = "{{.ID}}"
+port_name = "ssh"
 {{end}}
 `
 
