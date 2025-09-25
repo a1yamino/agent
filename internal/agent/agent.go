@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -132,6 +133,7 @@ func (a *Agent) Stop() error {
 // bootstrap 启动与注册工作流
 func (a *Agent) bootstrap() error {
 	// 1. 检查本地身份
+	log.Printf("Checking for existing node ID at %s...", a.config.IdentityFilePath)
 	nodeID, err := registration.LoadNodeID(a.config.IdentityFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to load node ID: %w", err)

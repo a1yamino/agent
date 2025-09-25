@@ -78,6 +78,7 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
+	cfg.IdentityFilePath = os.ExpandEnv(cfg.IdentityFilePath)
 	return cfg, nil
 }
 
