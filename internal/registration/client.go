@@ -89,7 +89,7 @@ func LoadNodeID(filePath string) (string, error) {
 }
 
 // SaveNodeID 保存节点ID到文件
-func SaveNodeID(filePath, nodeID string) error {
+func SaveNodeID(filePath string, nodeID int64) error {
 	// 确保目录存在
 	dir := filepath.Dir(filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -98,7 +98,8 @@ func SaveNodeID(filePath, nodeID string) error {
 
 	// 原子写入
 	tmpFile := filePath + ".tmp"
-	if err := os.WriteFile(tmpFile, []byte(nodeID), 0644); err != nil {
+	nodeIDStr := fmt.Sprintf("%d", nodeID)
+	if err := os.WriteFile(tmpFile, []byte(nodeIDStr), 0644); err != nil {
 		return fmt.Errorf("failed to write temp file: %w", err)
 	}
 

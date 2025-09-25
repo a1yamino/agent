@@ -170,8 +170,8 @@ func (a *Agent) bootstrap() error {
 		return fmt.Errorf("failed to save node ID: %w", err)
 	}
 
-	a.nodeID = regResp.NodeID
-	fmt.Printf("Successfully registered as node: %s\n", regResp.NodeID)
+	a.nodeID = strconv.FormatInt(regResp.NodeID, 10)
+	fmt.Printf("Successfully registered as node: %d\n", regResp.NodeID)
 
 	return nil
 }
