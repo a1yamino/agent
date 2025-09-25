@@ -148,12 +148,17 @@ func (a *Agent) bootstrap() error {
 	// if err != nil {
 	// 	return fmt.Errorf("failed to get machine ID: %w", err)
 	// }
-
 	// fmt.Printf("Machine ID: %s\n", machineID)
+
+	hostName, err := registration.GetHostname()
+	if err != nil {
+		return fmt.Errorf("failed to get hostname: %w", err)
+	}
+	fmt.Printf("Hostname: %s\n", hostName)
 
 	// 3. 向平台注册
 	regClient := registration.NewClient(a.config.CentralPlatform.APIURL)
-	regResp, err := regClient.Register(a.config.CentralPlatform.BootstrapToken)
+	regResp, err := regClient.Register(a.config.CentralPlatform.BootstrapToken, hostName)
 	if err != nil {
 		return fmt.Errorf("failed to register with platform: %w", err)
 	}

@@ -15,6 +15,7 @@ import (
 // RegisterRequest 注册请求
 type RegisterRequest struct {
 	MachineID      string `json:"machine_id"`
+	Hostname       string `json:"hostname"`
 	BootstrapToken string `json:"bootstrap_token,omitempty"`
 }
 
@@ -110,8 +111,9 @@ func SaveNodeID(filePath, nodeID string) error {
 }
 
 // Register 向中央平台注册节点
-func (c *Client) Register(bootstrapToken string) (*RegisterResponse, error) {
+func (c *Client) Register(bootstrapToken, hostname string) (*RegisterResponse, error) {
 	req := RegisterRequest{
+		Hostname:       hostname,
 		BootstrapToken: bootstrapToken,
 	}
 
@@ -145,4 +147,12 @@ func (c *Client) Register(bootstrapToken string) (*RegisterResponse, error) {
 	}
 
 	return &registerResp, nil
+}
+
+func GetHostname() (string, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", fmt.Errorf("failed to get hostname: %w", err)
+	}
+	return hostname, nil
 }
