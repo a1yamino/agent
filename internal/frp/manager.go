@@ -39,10 +39,10 @@ type Manager struct {
 
 // frpc.toml模板
 const frpcTemplate = `
-[common]
 serverAddr = "{{.ServerAddr}}"
 serverPort = {{.ServerPort}}
-token = "{{.FrpToken}}"
+auth.method = "token"
+auth.token = "{{.FrpToken}}"
 user = "{{.NodeID}}"
 
 # 控制隧道
