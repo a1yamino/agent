@@ -21,7 +21,7 @@ type RegisterRequest struct {
 
 // RegisterResponse 注册响应
 type RegisterResponse struct {
-	NodeID    string `json:"node_id"`
+	NodeID    int64  `json:"node_id"`
 	Message   string `json:"message"`
 	Timestamp int64  `json:"timestamp"`
 }
