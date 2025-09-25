@@ -1,6 +1,6 @@
 # Utopia Node Agent Configuration
 # 节点ID持久化路径
-identity_file_path: "/etc/utopia/node_id"
+identity_file_path: "/var/opt/utopia/node_id"
 
 # 中央平台信息
 central_platform:

@@ -78,7 +78,7 @@ meta_port_name = "ssh"
 // NewManager 创建新的FRP管理器
 func NewManager(config *Config) (*Manager, error) {
 	// 创建临时配置目录
-	tmpDir := "/var/run/utopia"
+	tmpDir := "/tmp/utopia"
 	if err := os.MkdirAll(tmpDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create temp directory: %w", err)
 	}
