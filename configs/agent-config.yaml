@@ -16,6 +16,6 @@ frp:
 
 # Agent自身API服务配置
 agent_api:
-  listen_address: "127.0.0.1:9200"
+  listen_address: "0.0.0.0:9200"
   # 用于与中央平台通信的认证令牌
   auth_token: "a_very_secret_agent_api_token"
