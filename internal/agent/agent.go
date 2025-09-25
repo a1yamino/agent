@@ -90,15 +90,28 @@ func (a *Agent) Stop() error {
 	// 取消上下文
 	a.cancel()
 
-	// 等待所有goroutine完成
-	a.wg.Wait()
+	// 等待所有goroutine完成，但设置超时
+	done := make(chan struct{})
+	go func() {
+		a.wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		fmt.Println("All goroutines stopped gracefully")
+	case <-time.After(15 * time.Second):
+		fmt.Println("Warning: Timeout waiting for goroutines to stop")
+	}
 
 	// 停止API服务器
 	if a.apiServer != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := a.apiServer.Stop(ctx); err != nil {
 			fmt.Printf("Error stopping API server: %v\n", err)
+		} else {
+			fmt.Println("API server stopped")
 		}
 	}
 
@@ -106,6 +119,8 @@ func (a *Agent) Stop() error {
 	if a.frpManager != nil {
 		if err := a.frpManager.Stop(); err != nil {
 			fmt.Printf("Error stopping FRP: %v\n", err)
+		} else {
+			fmt.Println("FRP stopped")
 		}
 		if err := a.frpManager.CleanupConfig(); err != nil {
 			fmt.Printf("Error cleaning up FRP config: %v\n", err)
@@ -116,6 +131,8 @@ func (a *Agent) Stop() error {
 	if a.gpuMonitor != nil {
 		if err := a.gpuMonitor.Close(); err != nil {
 			fmt.Printf("Error closing GPU monitor: %v\n", err)
+		} else {
+			fmt.Println("GPU monitor closed")
 		}
 	}
 
@@ -123,6 +140,8 @@ func (a *Agent) Stop() error {
 	if a.containerManager != nil {
 		if err := a.containerManager.Close(); err != nil {
 			fmt.Printf("Error closing container manager: %v\n", err)
+		} else {
+			fmt.Println("Container manager closed")
 		}
 	}
 

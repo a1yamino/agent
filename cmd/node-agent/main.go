@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"utopia-node-agent/internal/agent"
 	"utopia-node-agent/internal/config"
@@ -70,7 +71,29 @@ func main() {
 
 	// 优雅关闭
 	log.Info("Shutting down...")
-	if err := nodeAgent.Stop(); err != nil {
-		log.Errorf("Error during shutdown: %v", err)
+
+	// 设置关闭超时
+	shutdownDone := make(chan error, 1)
+	go func() {
+		shutdownDone <- nodeAgent.Stop()
+	}()
+
+	// 监听第二个 Ctrl+C 信号以强制退出
+	go func() {
+		<-sigChan
+		log.Warn("Received second signal, forcing exit...")
+		os.Exit(1)
+	}()
+
+	select {
+	case err := <-shutdownDone:
+		if err != nil {
+			log.Errorf("Error during shutdown: %v", err)
+		} else {
+			log.Info("Shutdown completed successfully")
+		}
+	case <-time.After(20 * time.Second):
+		log.Error("Shutdown timeout exceeded, forcing exit...")
+		os.Exit(1)
 	}
 }
