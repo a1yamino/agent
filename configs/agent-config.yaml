@@ -13,6 +13,7 @@ frp:
   server_addr: "101.126.152.16"
   server_port: 7000
   token: "utopia-auth-token"
+  port_range_start: 20000
 
 # Agent自身API服务配置
 agent_api:

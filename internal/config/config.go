@@ -30,9 +30,10 @@ type CentralPlatformConfig struct {
 
 // FRPConfig FRP配置
 type FRPConfig struct {
-	ServerAddr string `yaml:"server_addr"`
-	ServerPort int    `yaml:"server_port"`
-	Token      string `yaml:"token"`
+	ServerAddr     string `yaml:"server_addr"`
+	ServerPort     int    `yaml:"server_port"`
+	Token          string `yaml:"token"`
+	PortRangeStart int    `yaml:"port_range_start"`
 }
 
 // AgentAPIConfig Agent API配置

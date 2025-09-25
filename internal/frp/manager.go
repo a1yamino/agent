@@ -15,19 +15,22 @@ import (
 
 // Config FRP配置
 type Config struct {
-	ServerAddr   string      `json:"server_addr"`
-	ServerPort   int         `json:"server_port"`
-	FrpToken     string      `json:"frp_token"`
-	NodeID       string      `json:"node_id"`
-	AgentApiPort int         `json:"agent_api_port"`
-	Gpus         []GPUTunnel `json:"gpus"`
+	ServerAddr        string      `json:"server_addr"`
+	ServerPort        int         `json:"server_port"`
+	FrpToken          string      `json:"frp_token"`
+	NodeID            string      `json:"node_id"`
+	AgentApiPort      int         `json:"agent_api_port"`
+	ControlRemotePort int         `json:"control_remote_port"`
+	Gpus              []GPUTunnel `json:"gpus"`
 }
 
 // GPUTunnel GPU隧道配置
 type GPUTunnel struct {
-	ID           int `json:"id"`
-	WebLocalPort int `json:"web_local_port"`
-	SshLocalPort int `json:"ssh_local_port"`
+	ID            int `json:"id"`
+	WebLocalPort  int `json:"web_local_port"`
+	SshLocalPort  int `json:"ssh_local_port"`
+	WebRemotePort int `json:"web_remote_port"`
+	SshRemotePort int `json:"ssh_remote_port"`
 }
 
 // Manager FRP管理器
@@ -51,7 +54,7 @@ name = "control_{{.NodeID}}"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.AgentApiPort}}
-remotePort = 0
+remotePort = {{.ControlRemotePort}}
 [proxies.metadatas]
 node_id = "{{.NodeID}}"
 tunnel_type = "agent-control"
@@ -63,7 +66,7 @@ name = "data_{{$.NodeID}}_gpu{{.ID}}_web"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.WebLocalPort}}
-remotePort = 0
+remotePort = {{.WebRemotePort}}
 [proxies.metadatas]
 node_id = "{{$.NodeID}}"
 tunnel_type = "container-data"
@@ -75,7 +78,7 @@ name = "data_{{$.NodeID}}_gpu{{.ID}}_ssh"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = {{.SshLocalPort}}
-remotePort = 0
+remotePort = {{.SshRemotePort}}
 [proxies.metadatas]
 node_id = "{{$.NodeID}}"
 tunnel_type = "container-data"

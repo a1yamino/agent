@@ -270,25 +270,44 @@ func (a *Agent) generateFRPConfig() *frp.Config {
 		}
 	}
 
+	// 计算端口偏移
+	nodeIDInt, err := strconv.Atoi(a.nodeID)
+	if err != nil {
+		log.Fatalf("Invalid NodeID: %v", err)
+	}
+	portRangeStart := a.config.FRP.PortRangeStart
+	basePort := portRangeStart + (nodeIDInt-1)*17
+
+	// 控制隧道端口
+	controlRemotePort := basePort + 0 // service_offset = 0
+
 	// 生成GPU隧道配置
 	gpuCount, _ := a.gpuMonitor.GetGPUCount()
 	var gpuTunnels []frp.GPUTunnel
 
 	for i := 0; i < gpuCount; i++ {
+		// 每个GPU有两个服务(web, ssh), 所以service_offset要乘以2
+		// 控制隧道占用了offset 0, 所以GPU从1开始
+		webOffset := 1 + i*2
+		sshOffset := 1 + i*2 + 1
+
 		gpuTunnels = append(gpuTunnels, frp.GPUTunnel{
-			ID:           i,
-			WebLocalPort: 8000 + i*10,     // 为每个GPU分配Web端口范围
-			SshLocalPort: 8000 + i*10 + 1, // SSH端口
+			ID:            i,
+			WebLocalPort:  8000 + i*10,
+			SshLocalPort:  8000 + i*10 + 1,
+			WebRemotePort: basePort + webOffset,
+			SshRemotePort: basePort + sshOffset,
 		})
 	}
 
 	return &frp.Config{
-		ServerAddr:   a.config.FRP.ServerAddr,
-		ServerPort:   a.config.FRP.ServerPort,
-		FrpToken:     a.config.FRP.Token,
-		NodeID:       a.nodeID,
-		AgentApiPort: apiPort,
-		Gpus:         gpuTunnels,
+		ServerAddr:        a.config.FRP.ServerAddr,
+		ServerPort:        a.config.FRP.ServerPort,
+		FrpToken:          a.config.FRP.Token,
+		NodeID:            a.nodeID,
+		AgentApiPort:      apiPort,
+		ControlRemotePort: controlRemotePort,
+		Gpus:              gpuTunnels,
 	}
 }
 
